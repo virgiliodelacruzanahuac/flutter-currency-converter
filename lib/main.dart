@@ -17,8 +17,8 @@ class CurrencyConverter extends StatefulWidget {
 class _CurrencyConverterState extends State<CurrencyConverter> {
   final fromTextController = TextEditingController();
   List<String> currencies;
-  List<String> currenciesdesc;
-
+  String fromCurrencyDesc = "";
+  String toCurrencyDesc = "";
   String fromCurrency = "mxn";
   String toCurrency = "usd";
   String result = "0.00";
@@ -27,6 +27,19 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   void initState() {
     super.initState();
     _loadCurrencies();
+  }
+
+  Future<String> _getCurrenciesDesc(String curr) async {
+    String desc = "";
+    String uri =
+        "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json";
+    var response = await http.get(Uri.parse(uri));
+    var responseBody = json.decode(response.body);
+    Map curMap = responseBody;
+    desc = curMap[curr];
+    // currenciesdesc = curMap.values.toList();
+    setState(() {});
+    return desc;
   }
 
   Future<String> _loadCurrencies() async {
@@ -61,15 +74,19 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
     return "Success";
   }
 
-  _onFromChanged(String value) {
+  _onFromChanged(String value) async {
+    String temp = await _getCurrenciesDesc(value);
     setState(() {
       fromCurrency = value;
+      fromCurrencyDesc = temp;
     });
   }
 
-  _onToChanged(String value) {
+  _onToChanged(String value) async {
+    String temp = await _getCurrenciesDesc(value);
     setState(() {
       toCurrency = value;
+      toCurrencyDesc = temp;
     });
   }
 
@@ -79,6 +96,10 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
       w = toCurrency;
       toCurrency = fromCurrency;
       fromCurrency = w;
+      w = toCurrencyDesc;
+      toCurrencyDesc = fromCurrencyDesc;
+      fromCurrencyDesc = w;
+
     });
   }
 
@@ -109,6 +130,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
+                      Text(fromCurrencyDesc, style: TextStyle(fontSize: 25)),
                       ListTile(
                         title: TextField(
                           controller: fromTextController,
@@ -134,7 +156,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                               onPressed: _reinicia,
                             )
                           ]),
-
+                      Text(toCurrencyDesc, style: TextStyle(fontSize: 25)),
                       ListTile(
                         title: Chip(
                           label: result != null
