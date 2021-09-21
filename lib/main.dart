@@ -17,10 +17,11 @@ class CurrencyConverter extends StatefulWidget {
 class _CurrencyConverterState extends State<CurrencyConverter> {
   final fromTextController = TextEditingController();
   List<String> currencies;
-  String fromCurrencyDesc = "";
-  String toCurrencyDesc = "";
+
   String fromCurrency = "mxn";
   String toCurrency = "usd";
+  String fromCurrencyDesc = "";
+  String toCurrencyDesc = "";
   String result = "0.00";
 
   @override
@@ -50,6 +51,8 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
     Map curMap = responseBody;
     currencies = curMap.keys.toList();
     // currenciesdesc = curMap.values.toList();
+    fromCurrencyDesc = await _getCurrenciesDesc(fromCurrency);
+    toCurrencyDesc = await _getCurrenciesDesc(toCurrency);
     setState(() {});
     print(currencies);
     return "Success";
@@ -99,7 +102,6 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
       w = toCurrencyDesc;
       toCurrencyDesc = fromCurrencyDesc;
       fromCurrencyDesc = w;
-
     });
   }
 
