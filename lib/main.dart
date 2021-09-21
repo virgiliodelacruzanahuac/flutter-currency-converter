@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'listamonedas.dart';
 
 void main() => runApp(new MaterialApp(
       title: "Currency Converter",
@@ -16,8 +17,10 @@ class CurrencyConverter extends StatefulWidget {
 class _CurrencyConverterState extends State<CurrencyConverter> {
   final fromTextController = TextEditingController();
   List<String> currencies;
-  String fromCurrency = "USD";
-  String toCurrency = "GBP";
+  List<String> currenciesdesc;
+
+  String fromCurrency = "mxn";
+  String toCurrency = "usd";
   String result;
 
   @override
@@ -27,24 +30,32 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   }
 
   Future<String> _loadCurrencies() async {
-    String uri = "https://api.exchangeratesapi.io/latest";
-    var response = await http
-        .get(Uri.encodeFull(uri), headers: {"Accept": "application/json"});
+    String uri =
+        "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json";
+    var response = await http.get(Uri.parse(uri));
     var responseBody = json.decode(response.body);
-    Map curMap = responseBody['rates'];
+    Map curMap = responseBody;
     currencies = curMap.keys.toList();
+    // currenciesdesc = curMap.values.toList();
     setState(() {});
     print(currencies);
     return "Success";
   }
 
   Future<String> _doConversion() async {
-    String uri = "https://api.exchangeratesapi.io/latest?base=$fromCurrency&symbols=$toCurrency";
-    var response = await http
-        .get(Uri.encodeFull(uri), headers: {"Accept": "application/json"});
+    String uri =
+        'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api/latest/currencies/' +
+            fromCurrency +
+            '/' +
+            toCurrency +
+            '.json';
+
+    var response = await http.get(Uri.parse(uri));
     var responseBody = json.decode(response.body);
     setState(() {
-      result = (double.parse(fromTextController.text) * (responseBody["rates"][toCurrency])).toString();
+      result =
+          (double.parse(fromTextController.text) * (responseBody[toCurrency]))
+              .toStringAsFixed(2);
     });
     print(result);
     return "Success";
@@ -95,14 +106,16 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                       ),
                       ListTile(
                         title: Chip(
-                          label: result != null ?
-                          Text(
-                            result,
-                            style: Theme.of(context).textTheme.display1,
-                          ) : Text(""),
+                          label: result != null
+                              ? Text(
+                                  result,
+                                  style: Theme.of(context).textTheme.headline4,
+                                )
+                              : Text(""),
                         ),
                         trailing: _buildDropDownButton(toCurrency),
                       ),
+                      //listamonedas()
                     ],
                   ),
                 ),
@@ -125,9 +138,9 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
               ))
           .toList(),
       onChanged: (String value) {
-        if(currencyCategory == fromCurrency){
+        if (currencyCategory == fromCurrency) {
           _onFromChanged(value);
-        }else {
+        } else {
           _onToChanged(value);
         }
       },
