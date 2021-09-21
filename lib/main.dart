@@ -21,7 +21,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
 
   String fromCurrency = "mxn";
   String toCurrency = "usd";
-  String result;
+  String result = "0.00";
 
   @override
   void initState() {
@@ -73,6 +73,24 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
     });
   }
 
+  _intercambiaCurrency() {
+    setState(() {
+      String w = "";
+      w = toCurrency;
+      toCurrency = fromCurrency;
+      fromCurrency = w;
+    });
+  }
+
+  _reinicia() {
+    setState(() {
+      fromTextController.text = "";
+      fromCurrency = "mxn";
+      toCurrency = "usd";
+      result = "0.00";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,10 +118,23 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                         ),
                         trailing: _buildDropDownButton(fromCurrency),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_downward),
-                        onPressed: _doConversion,
-                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.calculate),
+                              onPressed: _doConversion,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.sync),
+                              onPressed: _intercambiaCurrency,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: _reinicia,
+                            )
+                          ]),
+
                       ListTile(
                         title: Chip(
                           label: result != null
